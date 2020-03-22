@@ -29,18 +29,33 @@ d3.csv("data.csv")
     .then(function(journalismData){
 
         // Step 1: Parse Data/Cast as numbers
-        journalismData.forEach(function(data){
-            data.smokes = +data.smokes;
-            data.age = +data.age;
-        });
+        
+        // --- Smokers vs. Age --- //
+        // journalismData.forEach(function(data){
+        //     data.smokes = +data.smokes;
+        //     data.age = +data.age;
+        // });
+        // ---------------------- //
 
+        // --- Healthcare vs. Poverty --- //
+        journalismData.forEach(function(data){
+            data.poverty = +data.poverty;
+            data.healthcare = +data.healthcare;
+        });
+        // ----------------------------- //
+
+        // Console.log the data to ensure data is loaded properly
+        console.log(journalismData);
+        
         // Step 2: Create scale functions
         var xLinearScale = d3.scaleLinear()
-            .domain([30, d3.max(journalismData, d => d.age)])
+            // .domain([30, d3.max(journalismData, d => d.age)]) // --- Smokers vs. Age --- //
+            .domain([8, d3.max(journalismData, d => d.poverty)]) // --- Healthcare vs. Poverty --- //
             .range([0, width]);
 
         var yLinearScale = d3.scaleLinear()
-            .domain([8, d3.max(journalismData, d => d.smokes)])
+            // .domain([8, d3.max(journalismData, d => d.smokes)]) // --- Smokers vs. Age --- //
+            .domain([2, d3.max(journalismData, d => d.healthcare)]) // --- Healthcare vs. Poverty --- //
             .range([height, 0]);
 
         // Step 3: Create axis functions
@@ -60,21 +75,28 @@ d3.csv("data.csv")
             .data(journalismData)
             .enter()
             .append("circle")
-            .attr("cx", d => xLinearScale(d.age))
-            .attr("cy", d => yLinearScale(d.smokes))
+            // --- Smokers vs. Age --- //
+            // .attr("cx", d => xLinearScale(d.age))
+            // .attr("cy", d => yLinearScale(d.smokes))
+            // --- Healthcare vs. Poverty --- //
+            .attr("cx", d => xLinearScale(d.poverty))
+            .attr("cy", d => yLinearScale(d.healthcare))
             .attr("r", "15")
             .attr("class", "stateCircle")
             .attr("opacity", ".7");
             
         // Step 6: Create scatter circle labels
-        var circlesLabelGroup = chartGroup.selectAll("text")
+        var circlesLabelGroup = chartGroup.selectAll(".text")
             .data(journalismData)
             .enter()
             .append("text")
-            .attr("x", d => xLinearScale(d.age) - 5)
-            .attr("y", d => yLinearScale(d.smokes) + 5)
-            // .attr("class", "stateText")
-            .attr("fill", "black")
+            // --- Smokers vs. Age --- //
+            // .attr("x", d => xLinearScale(d.age))
+            // .attr("y", d => yLinearScale(d.smokes) + 5)
+            // --- Healthcare vs. Poverty --- //
+            .attr("x", d => xLinearScale(d.poverty))
+            .attr("y", d => yLinearScale(d.healthcare) + 5)
+            .attr("class", "stateText")
             .text((d) => d.abbr);
 
         // Step 7: Create axes labels
@@ -84,11 +106,13 @@ d3.csv("data.csv")
             .attr("x", 0 - (height/2))
             .attr("dy", "1em")
             .attr("class", "aText")
-            .text("Smokers (%)");
+            // .text("Smokers (%)"); // --- Smokers vs. Age --- //
+            .text("Lacks Healthcare (%)"); // --- Healthcare vs. Poverty --- //
 
         chartGroup.append("text")
             .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
             .attr("class", "aText")
-            .text("Age");
+            // .text("Age"); // --- Smokers vs. Age --- //
+            .text("In Poverty (%)"); // --- Healthcare vs. Poverty --- //
 
     });
